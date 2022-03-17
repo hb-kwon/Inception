@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+    nginx:
+        build: ./requirements/nginx
+        restart: always
+        ports:
+            - "443:443"
+        volumes:
+            - wp:/var/www/html
+        networks:
+            - intra
+        tty: true
+    wordpress:
+        build: ./requirements/wordpress
+        restart: always
+        volumes:
+            - wp:/var/www/html
+        expose:
+            - "9000"
+        networks:
+            - intra
+        env_file:
+            - .env
+        tty: true
+    mariadb:
+        build: ./requirements/mariadb
+        restart: always
+        volumes :
+            - db:/var/lib/mysql
+        expose:
+            - "3306"
+        networks:
+            - intra
+        env_file:
+            - .env
+        tty: true
+networks:
+    intra:
+        driver: bridge
+# volumes:
+#     db: {}
+#     wp: {}
+volumes:
+  wp:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/hkwon/data/wp'
+  db:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/hkwon/data/db'
